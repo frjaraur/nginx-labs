@@ -32,7 +32,7 @@ boxes:
   mem: "1524"
   cpu: "2"
 
-- name: "client"
+- name: "nginx-client"
   role: "client"
   mgmt_ip: "10.10.10.15"
   hostonly_ip: "192.168.56.15"

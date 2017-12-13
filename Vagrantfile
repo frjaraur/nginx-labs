@@ -56,6 +56,11 @@ Vagrant.configure(2) do |config|
         v.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
         v.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        
+        if node['role'] == "client"
+          v.gui = true
+          v.customize ["modifyvm", :id, "--vram", "64"]
+        end
 
       end
 
@@ -86,7 +91,8 @@ Vagrant.configure(2) do |config|
 
 
       if node['role'] == "client"
-      	config.vm.provision "shell", inline: <<-SHELL
+        config.vm.provision "shell", inline: <<-SHELL
+          echo "ubuntu:ubuntu"|sudo chpasswd
           apt-get install -qq curl 
           DEBIAN_FRONTEND=noninteractive apt-get install -qq lxde xinit firefox unzip zip gpm mlocate console-common chromium-browser
           service gpm start
