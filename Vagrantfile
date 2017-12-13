@@ -32,15 +32,18 @@ Vagrant.configure(2) do |config|
   config.ssh.forward_x11
   config.vm.box = base_box
   config.vm.synced_folder "tmp_deploying_stage/", "/tmp_deploying_stage",create:true
-  
-  config.vm.synced_folder "nginx_keys/", "/nginx_keys"
-  
+
+  if Dir.exists?(File.expand_path(File.join(File.dirname(__FILE__), "./nginx_keys")))
+    config.vm.synced_folder "nginx_keys/", "/nginx_keys"
+  end
+
   config.vm.synced_folder "src/", "/src",create:true
   boxes.each do |node|
     config.vm.define node['name'] do |config|
       config.vm.hostname = node['name']
       config.vm.provider "virtualbox" do |v|
         v.name = node['name']
+        v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
         v.customize ["modifyvm", :id, "--memory", node['mem']]
         v.customize ["modifyvm", :id, "--cpus", node['cpu']]
 
