@@ -92,21 +92,23 @@ Vagrant.configure(2) do |config|
 
       if node['role'] == "client"
         config.vm.provision "shell", inline: <<-SHELL
-          echo "ubuntu:ubuntu"|sudo chpasswd
-          DEBIAN_FRONTEND=noninteractive apt-get install -qq curl lxde lxsession xinit firefox unzip zip gpm mlocate console-common chromium-browser
-          service gpm start
-          update-rc.d gpm enable
-          localectl set-x11-keymap es
-          localectl set-keymap es
-          setxkbmap -layout es
-          echo -e "XKBLAYOUT=\"es\"\nXKBMODEL=\"pc105\"\nXKBVARIANT=\"\"\nXKBOPTIONS=\"lv3:ralt_switch,terminate:ctrl_alt_bksp\"" >/etc/default/keyboard
+            echo "ubuntu:ubuntu"|sudo chpasswd
+            DEBIAN_FRONTEND=noninteractive apt-get install -qq xserver-xorg-legacy \
+            xfce4-session xfce4-terminal xfce4-xkb-plugin xterm curl xinit firefox unzip zip gpm mlocate console-common chromium-browser
+            service gpm start
+            update-rc.d gpm enable
+            localectl set-x11-keymap es
+            localectl set-keymap es
+            setxkbmap -layout es
+            echo -e "XKBLAYOUT=\"es\"\nXKBMODEL=\"pc105\"\nXKBVARIANT=\"\"\nXKBOPTIONS=\"lv3:ralt_switch,terminate:ctrl_alt_bksp\"" >/etc/default/keyboard
+            echo '@setxkbmap -layout "es"'|tee -a /etc/xdg/xfce4/xinitrc
         SHELL
-          #echo '@setxkbmap -option lv3:ralt_switch,terminate:ctrl_alt_bksp "es"' | sudo tee -a /etc/xdg/lxsession/LXDE/autostart
-          #echo '@setxkbmap -layout "es"'|tee -a /etc/xdg/lxsession/LXDE/autostart
-	      next
+
+        config.vm.provision "shell", inline: "sudo sed -i 's/allowed_users=.*$/allowed_users=anybody/' /etc/X11/Xwrapper.config"
+            #echo '@setxkbmap -option lv3:ralt_switch,terminate:ctrl_alt_bksp "es"' | sudo tee -a /etc/xdg/lxsession/LXDE/autostart
+            #echo '@setxkbmap -layout "es"'|tee -a /etc/xdg/lxsession/LXDE/autostart
+              next
       end
-
-
 
 
       ## INSTALL NGINX --> on script because we can reprovision
